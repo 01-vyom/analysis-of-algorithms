@@ -1,0 +1,7 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/Users/vyom/Downloads/jgrapht-1.5.1/**/*.jar",
+        "/Users/vyom/Desktop/UFL/Fall_2021/AOA/Prac/jgrapht-1.5.1/**/*.jar"
+    ]
+}
