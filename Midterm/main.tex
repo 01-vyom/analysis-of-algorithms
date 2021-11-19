@@ -1,0 +1,339 @@
+\documentclass{article}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{minted}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{mathtools}
+
+\usetikzlibrary{automata,positioning}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+\usepackage[sort]{natbib}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}        
+
+%
+% Basic Document Settings
+%
+
+\topmargin=-0.75in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.20in
+\headheight = 12pt
+\linespread{1.1}
+
+\pagestyle{fancy}
+\chead{\hmwkClass\ (\hmwkClassInstructor): \hmwkTitle}
+\rhead{\firstxmark}
+\lfoot{\lastxmark}
+\cfoot{\thepage}
+
+\renewcommand\headrulewidth{0.55pt}
+\renewcommand\footrulewidth{0.55pt}
+
+\setlength\parindent{0pt}
+
+
+\setcounter{secnumdepth}{0}
+
+%
+% Homework Problem Environment
+%
+% This environment takes an optional argument. When given, it will adjust the
+% problem counter. This is useful for when the problems given for your
+% assignment aren't sequential. See the last 3 problems of this template for an
+% example.
+
+%
+% Homework Details
+%   - Title
+%   - Due date
+%   - Class
+%   - Section/Time
+%   - Instructor
+%   - Author
+%
+
+\newcommand{\hmwkTitle}{MidTerm\ \#1}
+\newcommand{\hmwkDueDate}{October 26, 2021}
+\newcommand{\hmwkClassCode}{COT 5405}
+\newcommand{\hmwkClass}{Analysis of Algorithms}
+\newcommand{\hmwkClassYear}{Fall 2021}
+\newcommand{\hmwkClassInstructor}{Professor Alin Dobra}
+\newcommand{\hmwkAuthorName}{\textit{Vyom Pathak}}
+\newcommand{\hmwkUFID}{96703101}
+
+%
+%
+%
+% Various Helper Commands
+%
+
+% Useful for algorithms
+\newcommand{\alg}[1]{\textsc{\bfseries \footnotesize #1}}
+
+% For derivatives
+\newcommand{\deriv}[1]{\frac{\mathrm{d}}{\mathrm{d}x} (#1)}
+
+% For partial derivatives
+\newcommand{\pderiv}[2]{\frac{\partial}{\partial #1} (#2)}
+
+% Integral dx
+\newcommand{\dx}{\mathrm{d}x}
+
+% Alias for the Solution section header
+\newcommand{\solution}{\textbf{\large Solution}}
+
+% Probability commands: Expectation, Variance, Covariance, Bias
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Bias}{\mathrm{Bias}}
+
+% norm bars
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\begin{document}
+
+\begin{center}
+{\Large \hmwkClassCode\ \hmwkClass\ \hmwkClassYear\ \hmwkTitle}
+
+\begin{tabular}{rl}
+UFID: & \hmwkUFID \\
+Name: & \hmwkAuthorName \\
+Instructor: & \hmwkClassInstructor \\
+Due Date: & \hmwkDueDate \\ 
+% Collaborators: & [list all the people you worked with]
+\end{tabular}
+\end{center}
+
+\section*{Problem 1}
+\subsection*{Making change problem for U.S. Coin denomination [40]}
+\subsubsection{Problem Definition}
+Consider the problem of providing change to an arbitrary amount N using US currency denominations, i.e \$0.01, \$0.05, \$0.10, \$0.25, \$1, \$5, \$10, \$20, \$50, \$100. Find a polynomial algorithm that, when given N, finds the exact change (or indicates that such change is not possible) using the minimum number of coins/banknotes.
+\subsubsection*{Solution}
+The algorithm is pretty straight forward, first we sort the denominations in descending order. After that, for each denomination, divide the denomination with the given amount value and select it as the number of denominations for that coin. Update the amount by setting it to the remainder of the previous division. Now, at the end, we check weather the amount is equal to zero or not (i.e. we have taken the whole amount in the form of coins or not); if not return No Solution Exists else return the list tuples of denominations with the corresponding denomination count. The algorithm is shown in Algorithm~\ref{alg:main}.
+\textbf{Here, we assume that the modulo and division operator will given result with a precision of 2 decimals.}\\
+
+\textbf{Algorithm}
+\begin{algorithm}
+\caption{Function for making change from the given amount using U.S. denomination}
+\label{alg:main}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Amount\ $A$. U.S. Denomination Set\ $C$.
+\State \textbf{Output:} $List\ of\ tuples\ of\ denominations\ with\ corresponding\ coin\ count$\ if\ such\ change\ exists\ else\ $"No\ Solution\ Exists"$.
+\Function{MakeChange}{$A, C$}:
+\State $S\ \leftarrow\ \phi$
+\State $Sort\ C\ in\ descending\ order$
+ \For {coin $c' \in C$}
+\State $S\ \leftarrow\ S\ \bigcup\ (c', \lfloor A/c' \rfloor$);
+\State $A = A\ \bmod\ c'$;
+\EndFor
+\If{$A \neq 0$}
+\State \Return "No Solution Exists";
+\EndIf
+\State \Return S;
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+\clearpage
+\textbf{Analysis}
+
+\textit{Proof of Correctness}\\
+The algorithm always find the change (if possible) with the optimal solution set.\\
+\textbf{Proof:} Here as we are forming optimal solution by making consecutive choices, we can prove such a operation using proof by induction where the no. of set itself is finite i.e. maximum value of \#no. of denominations = 10. So, if there exists an optimal solution set with the choices made so far for k coins, then there also exists an optimal solution for further choices till k+1 [k+1 is 10 in our case] including the situation where the first selection is made. Thus, the algorithm always finds the change (if possible) with the optimal solution set.\\
+
+\textit{Running Time}\\ The algorithm finds the denomination (if it is possible to make the change) in $O(1)$.\\
+\textbf{Proof:} Here, for the sort operation, it is $O(\# of denominations)$ which is constant and thus it is done in $O(1)$ time. Also, each denomination is selected only once to compute the coin count to get the same which is also constant i.e. $O(1)$. Inside the for loop, only the addition and modulo operation re performed which are also a constant time operations. Thus, the overall time-complexity of the solution is $O(1)$.
+
+\section*{Problem 2}
+\subsection*{Longest Path in a Tree [30+10]} 
+\subsubsection{Problem Definition}
+Given a tree, provide an efficient algorithm that finds the length of and the actual sequence for the longest path starting at the root and terminating at a leaf. If we now assume that tree edges have weights, how does the algorithm need to be modified to accommodate the generalization?
+\subsubsection*{Solution}
+\textbf{Algorithm}
+
+\begin{algorithm}
+\caption{Helper Function to find the longest path}
+\label{alg:lpathhelp}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Node\ $root$ with attributes as $(data, left, right)$.
+\State \textbf{Output:} Returns the list of the longest path from the root to the leaf of the tree.
+\Function{LongestPathHelper}{$root$}:
+\If {$root = \phi$}
+\State \Return\ [\ ] ;
+\EndIf
+\State $rightPath = LongestPathHelper(root.right)$;
+\State $leftPath = LongestPathHelper(root.left)$;
+\If{$rightPath.length\ >\ leftPath.length$}
+\State $rightPath.add(0, root.data)$; \Comment{Adding Data at the start of the path}
+\State \Return $rightPath$;
+\Else
+\State $leftPath.add(0, root.data)$; \Comment{Adding Data at the start of the path}
+\State \Return $leftPath$; 
+\EndIf
+\State \Return;
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Printing the longest path}
+\label{alg:lpath}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Node\ $root$ with attributes as $(data, left, right)$.
+\State \textbf{Output:} Prints the longest path in the given tree.
+\State $path\ \leftarrow\ LongestPathHelper(root)$;
+\State Print the path from the list;
+\State Print $path.length$;
+\State \Return;
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Analysis}\\
+\textit{Proof of Correctness}\\
+The proposed algorithm always finds the longest path for any Binary Tree with $n$ nodes.\\
+\textbf{Proof:} We can prove this using induction.\\
+
+\textit{Base case}: Suppose (without loss of generalization) for a tree of only one or two nodes, the longest path is one or two respectively. For the third node, if we add it on the longest path, than the algorithm will pick the same path with the new added node as the longest path. If, we do not add it to the longest path, then also, the new path will be of equal length as that of the previous longest path and thus the algorithm will again pick the longest path.\\
+
+\textit{Inductive Hypothesis}: Assume for a tree with k nodes, we have the optimal longest path from the proposed algorithm.\\
+
+\textit{Inductive Step}: Prove that, if we add a one node and make a total of (k+1) nodes, we still get the optimal longest path from the proposed approach.\\
+
+There are 2 cases in general where we can add the new node:\\
+Case 1: The node is added to the optimal longest path at the end.\\
+For this case, if we run the algorithm, as we have already got the optimal longest path [$\because$ induction hypothesis], the added node will also selected on the same longest path and thus will generate the optimal longest path with updated length.\\ 
+Case 2: The node is added to any other part of the tree but the optimal longest path at the end.\\
+For this case, if we run the algorithm again, it doesn't matter that much because the added node will either create an equal length path or a shorter path and thus we still return the optimal largest path. [$\because$ from the Base Case]
+
+Hence, the proposed algorithm holds $TRUE$ for a Binary Tree with $n$ nodes.\\\\
+\textit{Running Time}\\
+The running time of the proposed algorithm is $O(n)$, where n is the number of nodes in the given Binary Tree.\\
+\textbf{Proof:} As the solution to the problem is recursive, and divides the problem into 2 half size sub-problems in each recursion and also performs only one operation in each recursive step; the recursive equation can be expressed as follows:
+\begin{equation*}
+    T(n) = 2\cdot T(\frac{n}{2}) + 1
+\end{equation*}
+Now, we can derive the time complexity of this equation using \textbf{Master's theorem's Case 1}~\cite{cormen1990introduction} i.e. where $[f(n)\ =\ O(n^{log_b(a-\epsilon)})\ where\ b=2,\ a=2\ and\ \epsilon=1]$.\\ Thus, the final run time can be derived as follows:
+\begin{align*}
+    T(n) & = O(n^{(log_b(a))})\ (where\ b = 2\ and\ a = 2)\\
+    T(n) & = O(n^{(log_2(2))})\\
+    T(n) & = O(n)
+\end{align*}
+Thus, the run-time of the proposed algorithm is $O(n)$.\\\\
+\textbf{Follow Up}\\
+For the weighted binary tree, the algorithm~\ref{alg:lpath} will change such that instead of comparing the length of the path for each sub-tree, we will compare the weights of each edges for the particular node value. The modified algorithm is shown in Algorithm~\ref{alg:lpath2}. Here, we assume that, longest path for a weighted binary tree is the weighted path and thus, the path with the most weight sum is the longest path. Also, we assume that the Node attribute all holds the edge weights for the right as well as left edge.
+\begin{algorithm}
+\caption{Helper Function to find the longest path in weighted graph}
+\label{alg:lpath2}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Node\ $root$ with attributes as $(data, left, right, leftWeight, rightWeight)$.
+\State \textbf{Output:} Returns the list of the longest path from the root to the leaf of the tree w.r.t to the weight-sum along with the total weight value of the path.
+\Function{LongestPathHelper}{$root$}:
+\If {$root = \{ \}$}
+\State \Return\ [\ ],0 ;
+\EndIf
+\State $rightPath,rweight = LongestPathHelper(root.right)$;
+\State $leftPath,lweight = LongestPathHelper(root.left)$;
+\If{$rweight+root.rightWeight\ >\ lweight + root.leftWeight$}
+\State $rightPath.add(0, root.data)$; \Comment{Adding Data at the start of the path and updating the weight}
+\State \Return $rightPath,\ rweight+root.rightWeight$;
+\Else
+\State $leftPath.add(0, root.data)$; \Comment{Adding Data at the start of the path and updating the weight}
+\State \Return $leftPath,\ lweight + root.leftWeight$; 
+\EndIf
+\State \Return;
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+\clearpage
+\section*{Problem 3}
+\subsection*{Largest element in a k shifted sorted list [20]} 
+\subsubsection*{Problem Definition}
+Suppose you are given an array A[1..n] of sorted integers that have been circularly shifted k positions to the right (for an unknown k). For example, [35, 42, 5, 15, 27, 29] is a sorted array that has been circularly shifted k = 2 positions, while [27, 29, 35, 42, 5, 15] has been shifted k = 4 positions. We can obviously find the largest element in A in O(n) time. Describe an O(log n) algorithm.
+\subsubsection*{Solution}
+\textbf{Algorithm}\\
+We can use modified binary search on the the given array to find the maximum value. Here, we have to basically find the first number which is lesser the first number. Here, we check for each half of the array, if the middle element is lesser than the first element, then the maximum element lies in the left half of the list, else the maximum element lies in the right half of the list. Also, we handle the middle element i.e. if it is at the start of the list and if it is somewhere in the middle ans is the maximum; we simply return the middle value. The algorithm is shown in Algorithm~\ref{alg:maxfind}.\\
+
+\begin{algorithm}
+\caption{Function for performing the binary-search}
+\label{alg:bsearch}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Start index\ $l$. End index\ $r$. List of numbers\ $nums$.
+\State \textbf{Output:} Maximum number in the given list.
+\Function{FindMaxHelper}{$l,\ r,\ nums$}:
+\If{$l=r$}
+\State \Return nums[l];
+\EndIf
+\State $m \leftarrow \lfloor \frac{(l+r)}{2}\rfloor;$
+\If {$m=0\ and\ nums[m]>nums[m+1]$}
+\State \Return $nums[m]$;
+\ElsIf{$m\ <\ r\ and\ nums[m\ +\ 1]\ <\ nums[m]\ and\ m>0\ and\ nums[m]\ >\ nums[m-1] $}
+\State \Return $nums[m]$;
+\EndIf
+\If {$nums[m]\ <\ nums[l]$}
+\State \Return $FindMaxHelper(nums, l, m-1)$;
+\Else
+\State \Return $FindMaxHelper(nums, m+1, r)$;
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Function for finding the maximum value}
+\label{alg:maxfind}
+\begin{algorithmic}[1]
+\State \textbf{Input:} List of numbers\ $nums$.
+\State \textbf{Output:} Prints the maximum value from the given list
+\Function{FindMax}{$nums$}:
+\State $value\ \leftarrow\ FindMaxHelper(0,\ nums.length-1,\ nums)$
+\State print(value);
+\State \Return;
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Analysis}\\
+\textit{Proof of Correctness}\\
+The algorithm always finds the largest number in a z shifted sorted array where $r-l=n$ for all $n$.\\
+\textbf{Proof:} We can prove this using induction. \\
+\textit{Base Case: } When the we have only one element ($l=r$) we just return that element only. If also in a list of size three and the value of $m$ is the index 1, and the middle element is the maximum element we return the element. \\
+\textit{Induction Hypothesis: } Let $r-l<=k$ where the proposed algorithm always finds the correct solution.\\
+\textit{Inductive Step: } Prove that, if $l-r=k+1$ the proposed algorithm still finds the largest number. \\
+There are three cases in this situation:\\
+Case 1: Suppose the middle element is the max number, then using the base case, we simply return that value.\\
+Case 2: Suppose $nums[l]>nums[m]$, this means that we have to find the solution on the left half of the list i.e. in the range $(l)\ and\ (m-1)$. We do this because of the $z$ shift, it is the case that the shift is at-most equal to the value of $m$ for the given list. This implies that the larger number are a part of the starting of the list rather than the end of the list. Here, the value of $n$ for the recursion is $\lfloor(l+r)/2\rfloor 1-l$. Here, if $r+l$ is even, then $n$ is $(r-l)/2$ which is also smaller than $r-l$ ($k+1$). And, if $l+r$ is odd, then $n$ is $(r-l)/2 -1$ which is smaller than $r-l$.  Thus, the recursive call works in a range of a smaller range than $k+1$ size and thus using induction it works i.e. gives the largest element.\\
+Case 3: Suppose $nums[l]<nums[m]$, this means that we have to find the solution on the right half of the list i.e in the range $(m+1) and (r)$. We do this because of the $z$ shift, it is the case that the shift is at-least equal equal to the $m$ value i.e. the larger element is present either on the right half or it is the right-most element. In this case we need to show that $r-(m+1)\leqslant(r-l)$. So, similar to the above condition, if $r+l$ is even, we get $(r-l)/2-1$ which is less than $r-l$. And, if $r+l$ is odd, we get $(r-l)/2-1/2$ which is also less than $r-l$. Thus, this recursive call works in the smaller range of the list and thus it is assumed to be working using the induciton hypothesis. \\
+
+Finally, as all the cases of the indcutive step are working, we conclude that the FindMax Algorithm always finds the largest number is correct.\\
+
+\textit{Running Time}\\
+The running time of the proposed algorithm is $O(log(n))$, where n is the size of the input list.\\
+\textbf{Proof:} As the solution to the problem is recursive, and divides the problem into half size in each recursion and also performs only one operation in each recursive step; the recursive equation can be expressed as follows:
+\begin{equation*}
+    T(n) = T(\frac{n}{2}) + 1
+\end{equation*}
+Now, we can derive the time complexity of this equation using \textbf{Master's theorem's Case 2}~\cite{cormen1990introduction} i.e. where $[f(n)\ =\ \Theta(log_b(a))\ and\ b=2,\ and\ a=1]$. Thus, the final run time can be derived as follows:
+\begin{align*}
+    T(n) & = O(n^{(log_b(a))}\cdot log(n)\ (where\ b = 2\ and\ a = 1)\\
+    T(n) & = O(n^{(log_2(1))}\cdot log(n))\\
+    T(n) & = O(log(n))
+\end{align*}
+Thus, the run-time of the proposed algorithm is $O(log(n))$.
+\section*{Problem 4}
+\subsection*{Finding generalized set for Problem 1 [30 bonus]}
+\subsubsection*{Problem Definition}
+For problem 1, find the most general set of currency so that the algorithm you found is still correct. Your solution will be judged based on generality. Unless the solution is correct and the generalization is non-trivial, no points will be awarded.
+\subsubsection*{Solution}
+A coin system which always gives optimal solution when the proposed greedy algorithm is applied can be considered as a canonical coin system~\cite{cai2009canonical}. Thus, for a 4 to 5 coin system, we can prove that many series can be a canonical series using work of Cai and Zheng with Theorem 1 and Theorem 2. This helps us to generalize the algorithm for any given coin system. i.e. check whether the given coin system is canonical or not, if it is, then we can just say that we can the greedy algorithm will always give the optimal solution.~\cite{cai2009canonical}
+\bibliographystyle{plain}
+\bibliography{main}
+\end{document}
